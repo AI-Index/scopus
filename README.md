@@ -1,0 +1,1 @@
+Run `python query.py` to generate the CSV of Scopus data.

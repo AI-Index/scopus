@@ -23,7 +23,7 @@ def scopus_query_request(query, api_key):
     return response
 
 
-def query_over_time(query_items, start_year=1995, end_year=2018):
+def query_over_time(query_items, start_year=1995, end_year=2019):
 
     print(" AND ".join(query_items))
 

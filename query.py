@@ -1,26 +1,11 @@
 import csv
 import datetime
-import requests
-
-# api_key = "REPLACE_WITH_API_KEY____________"
-api_key = "2752796210daebe3deb3c8d79bf7d15e"
-filename = "ai_papers.csv"
-
-
-def scopus_query_request(query, api_key):
-    # Request
-    # GET http://api.elsevier.com/content/search/scopus
-    try:
-        response = requests.get(
-            url="https://api.elsevier.com/content/search/scopus",
-            params={
-                "query": query,
-                "apiKey": api_key,
-            },
-        )
-    except requests.exceptions.RequestException:
-        print('HTTP Request failed')
-    return response
+from config import config
+from utils import scopus_query_request
+"""
+Collect stats on AI papers and AI papers in computer science (a subset) over
+many years.
+"""
 
 
 def query_over_time(query_items, start_year=1995, end_year=2019):
@@ -29,6 +14,7 @@ def query_over_time(query_items, start_year=1995, end_year=2019):
 
     results = []
 
+    api_key = config.api_key
     tmp_query_items = query_items + ["PUBYEAR BEF %d" % (start_year + 1)]
     query_string = " AND ".join(tmp_query_items)
     response = scopus_query_request(query_string, api_key)
@@ -57,7 +43,13 @@ def query_over_time(query_items, start_year=1995, end_year=2019):
     return results
 
 
-def create_ai_papers_csv(filename, ai_data, cs_data, total_data, start_year=1996):
+def create_ai_papers_csv(
+    filename,
+    ai_data,
+    cs_data,
+    total_data,
+    start_year=1996
+):
     year = start_year
     with open(filename, 'w') as csvfile:
         papers_writer = csv.writer(csvfile, delimiter=',')
@@ -68,6 +60,7 @@ def create_ai_papers_csv(filename, ai_data, cs_data, total_data, start_year=1996
 
 
 if __name__ == "__main__":
+    filename = "ai_papers.csv"
     start_year = 1995
     end_year = datetime.datetime.now().year
 
@@ -83,4 +76,10 @@ if __name__ == "__main__":
     ai_data, cs_data, total_data = (query_over_time(
         q, start_year=start_year, end_year=end_year) for q in [ai_query, cs_query, total_query])
 
-    create_ai_papers_csv(filename, ai_data, cs_data, total_data, start_year=start_year+1)
+    create_ai_papers_csv(
+        filename,
+        ai_data,
+        cs_data,
+        total_data,
+        start_year=start_year+1
+    )
